@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,10 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import es.uvigo.mei.pedidos.controladores.excepciones.ResourceNotFoundException;
 import es.uvigo.mei.pedidos.entidades.Articulo;
 import es.uvigo.mei.pedidos.servicios.ArticuloService;
 
@@ -33,54 +34,49 @@ public class ArticuloController {
 	ArticuloService articuloService;
 
 	@GetMapping()
-	public ResponseEntity<List<Articulo>> buscarTodos(
-			@RequestParam(name = "familiaId", required = false) Long familiaId,
-			@RequestParam(name = "descripcion", required = false) String descripcion) {
-		try {
-			List<Articulo> resultado = new ArrayList<>();
+	public ResponseEntity<List<Articulo>> buscarTodos() {
+		List<Articulo> resultado = new ArrayList<>();
+		resultado = articuloService.buscarTodos();
+		return new ResponseEntity<>(resultado, HttpStatus.OK);
+	}
 
-			if (familiaId != null) {
-				resultado = articuloService.buscarPorFamilia(familiaId);
-			} else if (descripcion != null) {
-				resultado = articuloService.buscarPorDescripcion(descripcion);
-			} else {
-				resultado = articuloService.buscarTodos();
-			}
+	@RequestMapping(params = "familiaId", method = RequestMethod.GET)
+	public ResponseEntity<List<Articulo>> buscarPorFamiliaId(
+			@RequestParam(name = "familiaId", required = true) Long familiaId) {
+		List<Articulo> resultado = new ArrayList<>();
+		resultado = articuloService.buscarPorFamilia(familiaId);
+		return new ResponseEntity<>(resultado, HttpStatus.OK);
 
-			if (resultado.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			}
+	}
 
-			return new ResponseEntity<>(resultado, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	@RequestMapping(params = "descripcion", method = RequestMethod.GET)
+	public ResponseEntity<List<Articulo>> buscarPorDescripcion(
+			@RequestParam(name = "descripcion", required = true) String descripcion) {
+		List<Articulo> resultado = new ArrayList<>();
+		resultado = articuloService.buscarPorDescripcion(descripcion);
+
+		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
 	public ResponseEntity<Articulo> buscarPorId(@PathVariable("id") Long id) {
 		Optional<Articulo> articulo = articuloService.buscarPorId(id);
 
-		if (articulo.isPresent()) {
-			return new ResponseEntity<>(articulo.get(), HttpStatus.OK);
+		if (articulo.isEmpty()) {
+			throw new ResourceNotFoundException("Articulo no encontrado");
 		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(articulo.get(), HttpStatus.OK);
 		}
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
-		try {
-			Optional<Articulo> articulo = articuloService.buscarPorId(id);
-			if (articulo.isPresent()) {
-				articuloService.eliminar(articulo.get());
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		Optional<Articulo> articulo = articuloService.buscarPorId(id);
+		if (articulo.isEmpty()) {
+			throw new ResourceNotFoundException("Articulo no encontrado");
+		} else {
+			articuloService.eliminar(articulo.get());
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 	}
 
@@ -88,30 +84,26 @@ public class ArticuloController {
 	public ResponseEntity<Articulo> modificar(@PathVariable("id") Long id, @RequestBody Articulo articulo) {
 		Optional<Articulo> articuloOptional = articuloService.buscarPorId(id);
 
-		if (articuloOptional.isPresent()) {
+		if (articuloOptional.isEmpty()) {
+			throw new ResourceNotFoundException("Articulo no encontrado");
+		} else {
 			Articulo nuevoArticulo = articuloService.modificar(articulo);
 			return new ResponseEntity<>(nuevoArticulo, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Articulo> crear(@RequestBody Articulo articulo) {
-		try {
-			Articulo nuevoArticulo = articuloService.crear(articulo);
-			URI uri = crearURIArticulo(nuevoArticulo);
+		Articulo nuevoArticulo = articuloService.crear(articulo);
+		URI uri = crearURIArticulo(nuevoArticulo);
 
-			return ResponseEntity.created(uri).body(nuevoArticulo);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return ResponseEntity.created(uri).body(nuevoArticulo);
 	}
-
 
 	// Construye la URI del nuevo recurso creado con POST
 	private URI crearURIArticulo(Articulo articulo) {
-		return ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(articulo.getId()).toUri();
+		return ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(articulo.getId())
+				.toUri();
 	}
 
 }

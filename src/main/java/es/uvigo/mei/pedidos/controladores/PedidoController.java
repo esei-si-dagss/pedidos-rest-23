@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.uvigo.mei.pedidos.entidades.Pedido;
+import es.uvigo.mei.pedidos.controladores.excepciones.ResourceNotFoundException;
 import es.uvigo.mei.pedidos.entidades.Cliente;
 import es.uvigo.mei.pedidos.servicios.PedidoService;
 import es.uvigo.mei.pedidos.servicios.ClienteService;
@@ -37,27 +39,24 @@ public class PedidoController {
 	ClienteService clienteService;
 
 	@GetMapping()
-	public ResponseEntity<List<Pedido>> buscarTodos(
-			@RequestParam(name = "clienteDNI", required = false) String clienteDni) {
-		try {
-			List<Pedido> resultado = new ArrayList<>();
+	public ResponseEntity<List<Pedido>> buscarTodos() {
+		List<Pedido> resultado = new ArrayList<>();
+		resultado = pedidoService.buscarTodos();
+		return new ResponseEntity<>(resultado, HttpStatus.OK);
 
-			if (clienteDni != null) {
-				Optional<Cliente> cliente = clienteService.buscarPorDNI(clienteDni);
-				if (cliente.isPresent()) {
-					resultado = pedidoService.buscarPorCliente(cliente.get());
-				}
-			} else {
-				resultado = pedidoService.buscarTodos();
-			}
+	}
 
-			if (resultado.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			}
+	@RequestMapping(params = "clienteDNI", method = RequestMethod.GET)
+	public ResponseEntity<List<Pedido>> buscarPorClienteDNI(
+			@RequestParam(name = "clienteDNI", required = true) String clienteDni) {
+		List<Pedido> resultado = new ArrayList<>();
 
+		Optional<Cliente> cliente = clienteService.buscarPorDNI(clienteDni);
+		if (cliente.isEmpty()) {
+			throw new ResourceNotFoundException("Cliente no encontrado");
+		} else {
+			resultado = pedidoService.buscarPorCliente(cliente.get());
 			return new ResponseEntity<>(resultado, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -65,26 +64,21 @@ public class PedidoController {
 	public ResponseEntity<Pedido> buscarPorId(@PathVariable("id") Long id) {
 		Pedido pedido = pedidoService.buscarPorIdConLineas(id);
 
-		if (pedido != null) {
-			return new ResponseEntity<>(pedido, HttpStatus.OK);
+		if (pedido == null) {
+			throw new ResourceNotFoundException("Pedido no encontrado");
 		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(pedido, HttpStatus.OK);
 		}
 	}
 
 	@DeleteMapping(path = "{id}")
 	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
-		try {
-			Optional<Pedido> pedido = pedidoService.buscarPorId(id);
-			if (pedido.isPresent()) {
-				pedidoService.eliminar(pedido.get());
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		Optional<Pedido> pedido = pedidoService.buscarPorId(id);
+		if (pedido.isEmpty()) {
+			throw new ResourceNotFoundException("Pedido no encontrado");
+		} else {
+			pedidoService.eliminar(pedido.get());
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 	}
 
@@ -92,26 +86,21 @@ public class PedidoController {
 	public ResponseEntity<Pedido> modificar(@PathVariable("id") Long id, @RequestBody Pedido pedido) {
 		Optional<Pedido> pedidoOptional = pedidoService.buscarPorId(id);
 
-		if (pedidoOptional.isPresent()) {
+		if (pedidoOptional.isEmpty()) {
+			throw new ResourceNotFoundException("Pedido no encontrado");
+		} else {
 			Pedido nuevoPedido = pedidoService.modificar(pedido);
 			return new ResponseEntity<>(nuevoPedido, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Pedido> crear(@RequestBody Pedido pedido) {
-		try {
-			Pedido nuevoPedido = pedidoService.crear(pedido);
-			URI uri = crearURIPedido(nuevoPedido);
+		Pedido nuevoPedido = pedidoService.crear(pedido);
+		URI uri = crearURIPedido(nuevoPedido);
 
-			return ResponseEntity.created(uri).body(nuevoPedido);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return ResponseEntity.created(uri).body(nuevoPedido);
 	}
-
 
 	// Construye la URI del nuevo recurso creado con POST
 	private URI crearURIPedido(Pedido pedido) {

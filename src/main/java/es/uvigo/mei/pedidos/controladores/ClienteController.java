@@ -35,7 +35,6 @@ public class ClienteController {
 	@Autowired
 	ClienteService clienteService;
 
-
 	@GetMapping()
 	public ResponseEntity<List<Cliente>> buscarTodos() {
 		List<Cliente> resultado = new ArrayList<>();
@@ -59,58 +58,58 @@ public class ClienteController {
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-
-
 	@GetMapping(path = "{dni}")
 	public ResponseEntity<Cliente> buscarPorDNI(@PathVariable("dni") String dni) {
 		Optional<Cliente> cliente = clienteService.buscarPorDNI(dni);
 
-		if (!cliente.isPresent()) {
-			throw new ResourceNotFoundException("Cliente no encontado");
-		}else {
+		if (cliente.isEmpty()) {
+			throw new ResourceNotFoundException("Cliente no encontrado");
+		} else {
 			return new ResponseEntity<>(cliente.get(), HttpStatus.OK);
-		} 
+		}
+
 	}
 
 	@DeleteMapping(path = "{dni}")
 	public ResponseEntity<HttpStatus> eliminar(@PathVariable("dni") String dni) {
 		Optional<Cliente> cliente = clienteService.buscarPorDNI(dni);
 
-		if (!cliente.isPresent()) {
-			throw new ResourceNotFoundException("Cliente no encontado");
-		}
-		else {
+		if (cliente.isEmpty()) {
+			throw new ResourceNotFoundException("Cliente no encontrado");
+		} else {
 			clienteService.eliminar(cliente.get());
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} 
+		}
 	}
 
 	@PutMapping(path = "{dni}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Cliente> modificar(@PathVariable("dni") String dni, @RequestBody @Valid Cliente cliente) {
+	public ResponseEntity<Cliente> modificar(@PathVariable("dni") String dni, @Valid @RequestBody Cliente cliente) {
 		Optional<Cliente> clienteOptional = clienteService.buscarPorDNI(dni);
 
-		if (!clienteOptional.isPresent()) {
-			throw new ResourceNotFoundException("Cliente no encontado");
-		}
-		else {
+		if (clienteOptional.isEmpty()) {
+			throw new ResourceNotFoundException("Cliente no encontrado");
+		} else {
 			Cliente nuevoCliente = clienteService.modificar(cliente);
 			return new ResponseEntity<>(nuevoCliente, HttpStatus.OK);
-		} 
+		}
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Cliente> crear(@RequestBody @Valid Cliente cliente) {
+	public ResponseEntity<Cliente> crear(@Valid @RequestBody Cliente cliente) {
 		String dni = cliente.getDNI();
 		if ((dni != null) && !dni.isBlank()) {
 			Optional<Cliente> clienteOptional = clienteService.buscarPorDNI(dni);
 
-			if (clienteOptional.isEmpty()) {
+			if (clienteOptional.isPresent()) {
+				// DNI ya existe
+				throw new WrongParameterException("DNI indicado ya existe");
+			} else {
 				Cliente nuevoCliente = clienteService.crear(cliente);
 				URI uri = crearURICliente(nuevoCliente);
 				return ResponseEntity.created(uri).body(nuevoCliente);
 			}
 		}
-		// No aporta DNI o DNI ya existe
+		// No aporta DNI
 		throw new WrongParameterException("Falta indicar DNI");
 	}
 
