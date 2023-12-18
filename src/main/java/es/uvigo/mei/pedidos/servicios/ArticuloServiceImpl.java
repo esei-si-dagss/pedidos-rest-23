@@ -95,7 +95,7 @@ public class ArticuloServiceImpl implements ArticuloService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Familia> buscarFamiliasPorDescripcion(String patron) {
-		return familiaDAO.findByPatronDescripcion(patron);
+		return null;//return familiaDAO.findByPatronDescripcion(patron);
 	}
 
 }

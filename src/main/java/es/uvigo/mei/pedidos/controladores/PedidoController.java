@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -46,7 +45,7 @@ public class PedidoController {
 
 	}
 
-	@RequestMapping(params = "clienteDNI", method = RequestMethod.GET)
+	@GetMapping(params = "clienteDNI")
 	public ResponseEntity<List<Pedido>> buscarPorClienteDNI(
 			@RequestParam(name = "clienteDNI", required = true) String clienteDni) {
 		List<Pedido> resultado = new ArrayList<>();
@@ -61,7 +60,7 @@ public class PedidoController {
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<Pedido> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Pedido> buscarPorId(@PathVariable Long id) {
 		Pedido pedido = pedidoService.buscarPorIdConLineas(id);
 
 		if (pedido == null) {
@@ -72,7 +71,7 @@ public class PedidoController {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		Optional<Pedido> pedido = pedidoService.buscarPorId(id);
 		if (pedido.isEmpty()) {
 			throw new ResourceNotFoundException("Pedido no encontrado");
@@ -83,7 +82,7 @@ public class PedidoController {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Pedido> modificar(@PathVariable("id") Long id, @RequestBody Pedido pedido) {
+	public ResponseEntity<Pedido> modificar(@PathVariable Long id, @RequestBody Pedido pedido) {
 		Optional<Pedido> pedidoOptional = pedidoService.buscarPorId(id);
 
 		if (pedidoOptional.isEmpty()) {

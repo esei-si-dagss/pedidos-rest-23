@@ -40,7 +40,7 @@ public class FamiliaControllerV2 {
 
 	@GetMapping()
 	public ResponseEntity<List<EntityModel<Familia>>> buscarTodos(
-			@RequestParam(name = "descripcion", required = false) String descripcion) {
+			@RequestParam(required = false) String descripcion) {
 		try {
 			List<Familia> resultado = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class FamiliaControllerV2 {
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<EntityModel<Familia>> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<EntityModel<Familia>> buscarPorId(@PathVariable Long id) {
 		Optional<Familia> familia = articuloService.buscarFamiliaPorId(id);
 
 		if (familia.isPresent()) {
@@ -76,7 +76,7 @@ public class FamiliaControllerV2 {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		try {
 			Optional<Familia> familia = articuloService.buscarFamiliaPorId(id);
 			if (familia.isPresent()) {
@@ -92,7 +92,7 @@ public class FamiliaControllerV2 {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<EntityModel<Familia>> modificar(@PathVariable("id") Long id,
+	public ResponseEntity<EntityModel<Familia>> modificar(@PathVariable Long id,
 			@Valid @RequestBody Familia familia) {
 		Optional<Familia> familiaOptional = articuloService.buscarFamiliaPorId(id);
 

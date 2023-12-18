@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -40,18 +39,18 @@ public class ArticuloController {
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-	@RequestMapping(params = "familiaId", method = RequestMethod.GET)
+	@GetMapping(params = "familiaId")
 	public ResponseEntity<List<Articulo>> buscarPorFamiliaId(
-			@RequestParam(name = "familiaId", required = true) Long familiaId) {
+			@RequestParam(required = true) Long familiaId) {
 		List<Articulo> resultado = new ArrayList<>();
 		resultado = articuloService.buscarPorFamilia(familiaId);
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 
 	}
 
-	@RequestMapping(params = "descripcion", method = RequestMethod.GET)
+	@GetMapping(params = "descripcion")
 	public ResponseEntity<List<Articulo>> buscarPorDescripcion(
-			@RequestParam(name = "descripcion", required = true) String descripcion) {
+			@RequestParam(required = true) String descripcion) {
 		List<Articulo> resultado = new ArrayList<>();
 		resultado = articuloService.buscarPorDescripcion(descripcion);
 
@@ -59,7 +58,7 @@ public class ArticuloController {
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<Articulo> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Articulo> buscarPorId(@PathVariable Long id) {
 		Optional<Articulo> articulo = articuloService.buscarPorId(id);
 
 		if (articulo.isEmpty()) {
@@ -70,7 +69,7 @@ public class ArticuloController {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		Optional<Articulo> articulo = articuloService.buscarPorId(id);
 		if (articulo.isEmpty()) {
 			throw new ResourceNotFoundException("Articulo no encontrado");
@@ -81,7 +80,7 @@ public class ArticuloController {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Articulo> modificar(@PathVariable("id") Long id, @RequestBody Articulo articulo) {
+	public ResponseEntity<Articulo> modificar(@PathVariable Long id, @RequestBody Articulo articulo) {
 		Optional<Articulo> articuloOptional = articuloService.buscarPorId(id);
 
 		if (articuloOptional.isEmpty()) {

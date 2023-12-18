@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -47,24 +46,24 @@ public class AlmacenController {
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-	@RequestMapping(params = "localidad", method = RequestMethod.GET)
+	@GetMapping(params = "localidad")
 	public ResponseEntity<List<Almacen>> buscarPorLocalidad(
-			@RequestParam(name = "localidad", required = true) String localidad) {
+			@RequestParam(required = true) String localidad) {
 		List<Almacen> resultado = new ArrayList<>();
 		resultado = almacenService.buscarPorLocalidad(localidad);
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-	@RequestMapping(params = "articuloId", method = RequestMethod.GET)
+	@GetMapping(params = "articuloId")
 	public ResponseEntity<List<Almacen>> buscarPorArticuloId(
-			@RequestParam(name = "articuloId", required = true) Long articuloId) {
+			@RequestParam(required = true) Long articuloId) {
 		List<Almacen> resultado = new ArrayList<>();
 		resultado = almacenService.buscarPorArticuloId(articuloId);
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<Almacen> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Almacen> buscarPorId(@PathVariable Long id) {
 		Optional<Almacen> almacen = almacenService.buscarPorId(id);
 
 		if (almacen.isEmpty()) {
@@ -75,7 +74,7 @@ public class AlmacenController {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		Optional<Almacen> almacen = almacenService.buscarPorId(id);
 
 		if (almacen.isEmpty()) {
@@ -87,7 +86,7 @@ public class AlmacenController {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Almacen> modificar(@PathVariable("id") Long id, @Valid @RequestBody Almacen almacen) {
+	public ResponseEntity<Almacen> modificar(@PathVariable Long id, @Valid @RequestBody Almacen almacen) {
 		Optional<Almacen> almacenOptional = almacenService.buscarPorId(id);
 
 		if (almacenOptional.isEmpty()) {
@@ -110,7 +109,7 @@ public class AlmacenController {
 	// Articulos de un Almacen
 	@GetMapping(path = "{idAlmacen}/articulos")
 	public ResponseEntity<List<ArticuloAlmacen>> buscarArticulosAlmacen(
-			@PathVariable("idAlmacen") Long idAlmacen) {
+			@PathVariable Long idAlmacen) {
 		List<ArticuloAlmacen> resultado = new ArrayList<>();
 		resultado = almacenService.buscarArticulosAlmacenPorAlmacenId(idAlmacen);
 
@@ -121,7 +120,7 @@ public class AlmacenController {
 	// Recuperar datos de un Articulo en el Almacén indicado
 	@GetMapping(path = "{idAlmacen}/articulos/{idArticulo}")
 	public ResponseEntity<ArticuloAlmacen> buscarArticuloAlmacenPorId(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo) {
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo) {
 		Optional<ArticuloAlmacen> articuloAlmacen = almacenService
 				.buscarArticuloAlmacenPorArticuloIdAlmacenId(idArticulo, idAlmacen);
 
@@ -137,7 +136,7 @@ public class AlmacenController {
 	// indicado
 	@GetMapping(path = "{idAlmacen}/articulos/{idArticulo}/stock")
 	public ResponseEntity<Integer> leerStockArticuloAlmacenPorId(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo) {
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo) {
 		Optional<ArticuloAlmacen> articuloAlmacen = almacenService
 				.buscarArticuloAlmacenPorArticuloIdAlmacenId(idArticulo, idAlmacen);
 
@@ -152,7 +151,7 @@ public class AlmacenController {
 	// Actualizar los datos de Stock de un Artículo en el Almacén indicado")
 	@PutMapping(path = "{idAlmacen}/articulos/{idArticulo}")
 	public ResponseEntity<ArticuloAlmacen> modificarArticuloAlmacen(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo,
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo,
 			@Valid @RequestBody ArticuloAlmacen articuloAlmacen) {
 		// Recuperar nuevo stock
 		Integer nuevoStock = articuloAlmacen.getStock();
@@ -163,7 +162,7 @@ public class AlmacenController {
 	// Actualizar directamente el stock de un Articulo en el Almacén indicado
 	@PutMapping(path = "{idAlmacen}/articulos/{idArticulo}/stock")
 	public ResponseEntity<ArticuloAlmacen> modificarArticuloAlmacenDirecto(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo,
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo,
 			@RequestBody Integer nuevoStock) {
 		return _modificarStockArticuloAlmacen(idAlmacen, idArticulo, nuevoStock);
 	}
@@ -186,8 +185,8 @@ public class AlmacenController {
 	// DELETE {id}/articulos/{id}
 	// Eliminar los datos de Stock de un Artículo en el Almacén indicado
 	@DeleteMapping(path = "{idAlmacen}/articulos/{idArticulo}")
-	public ResponseEntity<HttpStatus> eliminarArticuloAlmacen(@PathVariable("idAlmacen") Long idAlmacen,
-			@PathVariable("idArticulo") Long idArticulo) {
+	public ResponseEntity<HttpStatus> eliminarArticuloAlmacen(@PathVariable Long idAlmacen,
+			@PathVariable Long idArticulo) {
 		Optional<ArticuloAlmacen> articuloAlmacen = almacenService
 				.buscarArticuloAlmacenPorArticuloIdAlmacenId(idArticulo, idAlmacen);
 		if (articuloAlmacen.isEmpty()) {
@@ -201,7 +200,7 @@ public class AlmacenController {
 	// POST {id}/articulos/
 	// Crear los datos de Stock de un Artículo nuevo en el Almacén indicado
 	@PostMapping(path = "{idAlmacen}/articulos")
-	public ResponseEntity<ArticuloAlmacen> crearArticuloAlmacen(@PathVariable("idAlmacen") Long idAlmacen,
+	public ResponseEntity<ArticuloAlmacen> crearArticuloAlmacen(@PathVariable Long idAlmacen,
 			@Valid @RequestBody ArticuloAlmacen articuloAlmacen) {
 		Long idArticulo = articuloAlmacen.getArticulo().getId();
 		Integer stock = articuloAlmacen.getStock();
@@ -212,8 +211,8 @@ public class AlmacenController {
 	// Crear directamente el stock de un Articulo nuevo en el Almacén indicado
 	@PostMapping(path = "{idAlmacen}/articulos/{idArticulo}/stock")
 	public ResponseEntity<ArticuloAlmacen> crearArticuloAlmacenDirecto(
-			@PathVariable("idAlmacen") Long idAlmacen, 
-			@PathVariable("idArticulo") Long idArticulo,
+			@PathVariable Long idAlmacen, 
+			@PathVariable Long idArticulo,
 			@RequestBody Integer stock) {
 		return _crearArticuloAlmacen(idAlmacen, idArticulo, stock);
 	}

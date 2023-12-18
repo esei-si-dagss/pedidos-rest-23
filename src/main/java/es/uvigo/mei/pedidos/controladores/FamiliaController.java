@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -41,16 +40,16 @@ public class FamiliaController {
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-	@RequestMapping(params = "descripcion", method = RequestMethod.GET)
+	@GetMapping(params = "descripcion")
 	public ResponseEntity<List<Familia>> buscarPorDescripcion(
-			@RequestParam(name = "descripcion", required = true) String descripcion) {
+			@RequestParam(required = true) String descripcion) {
 		List<Familia> resultado = new ArrayList<>();
 		resultado = articuloService.buscarFamiliasPorDescripcion(descripcion);
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<Familia> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Familia> buscarPorId(@PathVariable Long id) {
 		Optional<Familia> familia = articuloService.buscarFamiliaPorId(id);
 
 		if (familia.isEmpty()) {
@@ -61,7 +60,7 @@ public class FamiliaController {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		Optional<Familia> familia = articuloService.buscarFamiliaPorId(id);
 		if (familia.isEmpty()) {
 			throw new ResourceNotFoundException("Familia no encontrada");
@@ -72,7 +71,7 @@ public class FamiliaController {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Familia> modificar(@PathVariable("id") Long id, @RequestBody Familia familia) {
+	public ResponseEntity<Familia> modificar(@PathVariable Long id, @RequestBody Familia familia) {
 		Optional<Familia> familiaOptional = articuloService.buscarFamiliaPorId(id);
 
 		if (familiaOptional.isEmpty()) {

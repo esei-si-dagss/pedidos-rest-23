@@ -39,8 +39,8 @@ public class ArticuloControllerV2 {
 
 	@GetMapping()
 	public ResponseEntity<List<EntityModel<Articulo>>> buscarTodos(
-			@RequestParam(name = "familiaId", required = false) Long familiaId,
-			@RequestParam(name = "descripcion", required = false) String descripcion) {
+			@RequestParam(required = false) Long familiaId,
+			@RequestParam(required = false) String descripcion) {
 		try {
 			List<Articulo> resultado = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class ArticuloControllerV2 {
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<EntityModel<Articulo>> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<EntityModel<Articulo>> buscarPorId(@PathVariable Long id) {
 		Optional<Articulo> articulo = articuloService.buscarPorId(id);
 
 		if (articulo.isPresent()) {
@@ -78,7 +78,7 @@ public class ArticuloControllerV2 {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		try {
 			Optional<Articulo> articulo = articuloService.buscarPorId(id);
 			if (articulo.isPresent()) {
@@ -94,7 +94,7 @@ public class ArticuloControllerV2 {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<EntityModel<Articulo>> modificar(@PathVariable("id") Long id,
+	public ResponseEntity<EntityModel<Articulo>> modificar(@PathVariable Long id,
 			@Valid @RequestBody Articulo articulo) {
 		Optional<Articulo> articuloOptional = articuloService.buscarPorId(id);
 

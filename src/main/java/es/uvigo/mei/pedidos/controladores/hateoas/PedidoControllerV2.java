@@ -44,7 +44,7 @@ public class PedidoControllerV2 {
 
 	@GetMapping()
 	public ResponseEntity<List<EntityModel<Pedido>>> buscarTodos(
-			@RequestParam(name = "clienteDni", required = false) String clienteDni) {
+			@RequestParam(required = false) String clienteDni) {
 		try {
 			List<Pedido> resultado = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class PedidoControllerV2 {
 	}
 
 	@GetMapping(path = "{id}")
-	public ResponseEntity<EntityModel<Pedido>> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<EntityModel<Pedido>> buscarPorId(@PathVariable Long id) {
 		Pedido pedido = pedidoService.buscarPorIdConLineas(id);
 
 		if (pedido != null) {
@@ -83,7 +83,7 @@ public class PedidoControllerV2 {
 	}
 
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		try {
 			Optional<Pedido> pedido = pedidoService.buscarPorId(id);
 			if (pedido.isPresent()) {
@@ -99,7 +99,7 @@ public class PedidoControllerV2 {
 	}
 
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<EntityModel<Pedido>> modificar(@PathVariable("id") Long id,
+	public ResponseEntity<EntityModel<Pedido>> modificar(@PathVariable Long id,
 			@Valid @RequestBody Pedido pedido) {
 		Optional<Pedido> pedidoOptional = pedidoService.buscarPorId(id);
 

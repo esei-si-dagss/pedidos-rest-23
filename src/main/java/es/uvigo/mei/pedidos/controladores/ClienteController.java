@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -42,24 +41,24 @@ public class ClienteController {
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-	@RequestMapping(params = "localidad", method = RequestMethod.GET)
+	@GetMapping(params = "localidad")
 	public ResponseEntity<List<Cliente>> buscarPorLocalidad(
-			@RequestParam(name = "localidad", required = true) String localidad) {
+			@RequestParam(required = true) String localidad) {
 		List<Cliente> resultado = new ArrayList<>();
 		resultado = clienteService.buscarPorLocalidad(localidad);
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
-	@RequestMapping(params = "nombre", method = RequestMethod.GET)
+	@GetMapping(params = "nombre")
 	public ResponseEntity<List<Cliente>> buscarPorNombre(
-			@RequestParam(name = "nombre", required = true) String nombre) {
+			@RequestParam(required = true) String nombre) {
 		List<Cliente> resultado = new ArrayList<>();
 		resultado = clienteService.buscarPorNombre(nombre);
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
 	@GetMapping(path = "{dni}")
-	public ResponseEntity<Cliente> buscarPorDNI(@PathVariable("dni") String dni) {
+	public ResponseEntity<Cliente> buscarPorDNI(@PathVariable String dni) {
 		Optional<Cliente> cliente = clienteService.buscarPorDNI(dni);
 
 		if (cliente.isEmpty()) {
@@ -71,7 +70,7 @@ public class ClienteController {
 	}
 
 	@DeleteMapping(path = "{dni}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("dni") String dni) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable String dni) {
 		Optional<Cliente> cliente = clienteService.buscarPorDNI(dni);
 
 		if (cliente.isEmpty()) {
@@ -83,7 +82,7 @@ public class ClienteController {
 	}
 
 	@PutMapping(path = "{dni}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Cliente> modificar(@PathVariable("dni") String dni, @Valid @RequestBody Cliente cliente) {
+	public ResponseEntity<Cliente> modificar(@PathVariable String dni, @Valid @RequestBody Cliente cliente) {
 		Optional<Cliente> clienteOptional = clienteService.buscarPorDNI(dni);
 
 		if (clienteOptional.isEmpty()) {

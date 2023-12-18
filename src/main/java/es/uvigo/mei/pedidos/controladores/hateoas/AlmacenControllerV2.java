@@ -45,7 +45,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Recuperar el listado de Almacenes")
 	@GetMapping()
 	public ResponseEntity<List<EntityModel<Almacen>>> buscarTodos(
-			@RequestParam(name = "localidad", required = false) String localidad,
+			@RequestParam(required = false) String localidad,
 			@RequestParam(name = "aticuloId", required = false) Long articuloId) {
 		try {
 			List<Almacen> resultado = new ArrayList<>();
@@ -73,7 +73,7 @@ public class AlmacenControllerV2 {
 
 	@Operation(summary = "Recuperar datos de un Almacén")
 	@GetMapping(path = "{id}")
-	public ResponseEntity<EntityModel<Almacen>> buscarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<EntityModel<Almacen>> buscarPorId(@PathVariable Long id) {
 		Optional<Almacen> almacen = almacenService.buscarPorId(id);
 
 		if (almacen.isPresent()) {
@@ -86,7 +86,7 @@ public class AlmacenControllerV2 {
 
 	@Operation(summary = "Eliminar un Almacén")
 	@DeleteMapping(path = "{id}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("id") Long id) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable Long id) {
 		try {
 			Optional<Almacen> almacen = almacenService.buscarPorId(id);
 			if (almacen.isPresent()) {
@@ -103,7 +103,7 @@ public class AlmacenControllerV2 {
 
 	@Operation(summary = "Actualizar un Almacén")
 	@PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<EntityModel<Almacen>> modificar(@PathVariable("id") Long id,
+	public ResponseEntity<EntityModel<Almacen>> modificar(@PathVariable Long id,
 			@Valid @RequestBody Almacen almacen) {
 		Optional<Almacen> almacenOptional = almacenService.buscarPorId(id);
 
@@ -136,7 +136,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Recuperar los datos de Stock de todos los Artículos del Almacén indicado")
 	@GetMapping(path = "{idAlmacen}/articulos")
 	public ResponseEntity<List<EntityModel<ArticuloAlmacen>>> buscarArticulosAlmacen(
-			@PathVariable("idAlmacen") Long idAlmacen) {
+			@PathVariable Long idAlmacen) {
 		try {
 			List<ArticuloAlmacen> resultado = new ArrayList<>();
 
@@ -159,7 +159,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Recuperar los datos de Stock de un Artículo en el Almacén indicado")
 	@GetMapping(path = "{idAlmacen}/articulos/{idArticulo}")
 	public ResponseEntity<EntityModel<ArticuloAlmacen>> buscarArticuloAlmacenPorId(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo) {
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo) {
 		Optional<ArticuloAlmacen> articuloAlmacen = almacenService
 				.buscarArticuloAlmacenPorArticuloIdAlmacenId(idArticulo, idAlmacen);
 
@@ -175,7 +175,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Recuperar directamente el stock de un Articulo en el Almacén indicado")
 	@GetMapping(path = "{idAlmacen}/articulos/{idArticulo}/stock")
 	public ResponseEntity<Integer> leerStockArticuloAlmacenPorId(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo) {
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo) {
 		Optional<ArticuloAlmacen> articuloAlmacen = almacenService
 				.buscarArticuloAlmacenPorArticuloIdAlmacenId(idArticulo, idAlmacen);
 
@@ -190,7 +190,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Actualizar los datos de Stock de un Artículo en el Almacén indicado")
 	@PutMapping(path = "{idAlmacen}/articulos/{idArticulo}")
 	public ResponseEntity<EntityModel<ArticuloAlmacen>> modificarArticuloAlmacen(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo,
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo,
 			@Valid @RequestBody ArticuloAlmacen articuloAlmacen) {
 		// Recuperar nuevo stock
 		Integer nuevoStock = articuloAlmacen.getStock();
@@ -201,7 +201,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Actualizar directamente el stock de un Articulo en el Almacén indicado")
 	@PutMapping(path = "{idAlmacen}/articulos/{idArticulo}/stock")
 	public ResponseEntity<EntityModel<ArticuloAlmacen>> modificarArticuloAlmacenDirecto(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo,
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo,
 			@Valid @RequestBody Integer nuevoStock) {
 		return _modificarStockArticuloAlmacen(idAlmacen, idArticulo, nuevoStock);
 	}
@@ -226,8 +226,8 @@ public class AlmacenControllerV2 {
 	// DELETE {id}/articulos/{id}
 	@Operation(summary = "Eliminar los datos de Stock de un Artículo en el Almacén indicado")
 	@DeleteMapping(path = "{idAlmacen}/articulos/{idArticulo}")
-	public ResponseEntity<HttpStatus> eliminarArticuloAlmacen(@PathVariable("idAlmacen") Long idAlmacen,
-			@PathVariable("idArticulo") Long idArticulo) {
+	public ResponseEntity<HttpStatus> eliminarArticuloAlmacen(@PathVariable Long idAlmacen,
+			@PathVariable Long idArticulo) {
 		try {
 			Optional<ArticuloAlmacen> articuloAlmacen = almacenService
 					.buscarArticuloAlmacenPorArticuloIdAlmacenId(idArticulo, idAlmacen);
@@ -245,7 +245,7 @@ public class AlmacenControllerV2 {
 	// POST {id}/articulos/
 	@Operation(summary = "Crear los datos de Stock de un Artículo nuevo en el Almacén indicado")
 	@PostMapping(path = "{idAlmacen}/articulos")
-	public ResponseEntity<EntityModel<ArticuloAlmacen>> crearArticuloAlmacen(@PathVariable("idAlmacen") Long idAlmacen,
+	public ResponseEntity<EntityModel<ArticuloAlmacen>> crearArticuloAlmacen(@PathVariable Long idAlmacen,
 			@Valid @RequestBody ArticuloAlmacen articuloAlmacen) {
 		Long idArticulo = articuloAlmacen.getArticulo().getId();
 		Integer stock = articuloAlmacen.getStock();
@@ -256,7 +256,7 @@ public class AlmacenControllerV2 {
 	@Operation(summary = "Crear directamente el stock de un Articulo nuevo en el Almacén indicado")
 	@PostMapping(path = "{idAlmacen}/articulos/{idArticulo}/stock")
 	public ResponseEntity<EntityModel<ArticuloAlmacen>> crearArticuloAlmacenDirecto(
-			@PathVariable("idAlmacen") Long idAlmacen, @PathVariable("idArticulo") Long idArticulo,
+			@PathVariable Long idAlmacen, @PathVariable Long idArticulo,
 			@Valid @RequestBody Integer stock) {
 		return _crearArticuloAlmacen(idAlmacen, idArticulo, stock);
 	}

@@ -54,9 +54,9 @@ public class ClienteControllerV2 {
 	@GetMapping()
 	public ResponseEntity<List<EntityModel<Cliente>>> buscarTodos(
 			@Parameter(description = "Localidad del Cliente", required = false)
-			@RequestParam(name = "localidad", required = false) String localidad,
+			@RequestParam(required = false) String localidad,
 			@Parameter(description = "Nombre del Cliente", required = false)
-			@RequestParam(name = "nombre", required = false) String nombre) {
+			@RequestParam(required = false) String nombre) {
 		try {
 			List<Cliente> resultado = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class ClienteControllerV2 {
 			@ApiResponse(responseCode = "200", description = "Cliente encontrado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Cliente.class)) }),
 			@ApiResponse(responseCode = "404", description = "Cliente no encontrado") })
 	@GetMapping(path = "{dni}")
-	public ResponseEntity<EntityModel<Cliente>> buscarPorDNI(@PathVariable("dni") String dni) {
+	public ResponseEntity<EntityModel<Cliente>> buscarPorDNI(@PathVariable String dni) {
 		Optional<Cliente> cliente = clienteService.buscarPorDNI(dni);
 
 		if (cliente.isPresent()) {
@@ -113,7 +113,7 @@ public class ClienteControllerV2 {
 			@ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
 			@ApiResponse(responseCode = "500", description = "Error en el acceso al Cliente") })
 	@DeleteMapping(path = "{dni}")
-	public ResponseEntity<HttpStatus> eliminar(@PathVariable("dni") String dni) {
+	public ResponseEntity<HttpStatus> eliminar(@PathVariable String dni) {
 		try {
 			Optional<Cliente> cliente = clienteService.buscarPorDNI(dni);
 			if (cliente.isPresent()) {
@@ -133,7 +133,7 @@ public class ClienteControllerV2 {
 			@ApiResponse(responseCode = "200", description = "Cliente actualizado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Cliente.class)) }),
 			@ApiResponse(responseCode = "404", description = "Cliente no encontrado") })
 	@PutMapping(path = "{dni}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<EntityModel<Cliente>> modificar(@PathVariable("dni") String dni, @Valid @RequestBody Cliente cliente) {
+	public ResponseEntity<EntityModel<Cliente>> modificar(@PathVariable String dni, @Valid @RequestBody Cliente cliente) {
 		Optional<Cliente> clienteOptional = clienteService.buscarPorDNI(dni);
 
 		if (clienteOptional.isPresent()) {
